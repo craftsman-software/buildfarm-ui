@@ -1,5 +1,7 @@
 # Next.js Shadcn Admin Dashboard
 
+![Dashboard Preview](public/dashboard.png)
+
 A modern admin dashboard UI built with Next.js and Shadcn UI. This project is a Next.js port of the [original Shadcn Admin Dashboard](https://github.com/satnaing/shadcn-admin) by [@satnaing](https://github.com/satnaing), adapted to leverage Next.js features while maintaining the original's elegant design and functionality. The project has been restructured to use the Next.js App Router, providing better performance and developer experience while keeping all the powerful features of the original dashboard.
 
 ## Features
