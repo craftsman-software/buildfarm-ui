@@ -1,10 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { IconDownload, IconPlus } from '@tabler/icons-react'
 import useDialogState from '@/hooks/use-dialog-state'
 import { toast } from '@/hooks/use-toast'
-import { Button } from '@/components/ui/button'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { columns } from './columns'
 import { DataTable } from './data-table'
