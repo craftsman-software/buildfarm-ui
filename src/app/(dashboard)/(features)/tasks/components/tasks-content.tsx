@@ -12,11 +12,11 @@ import TasksContextProvider, { TasksDialogType } from '../context/tasks-context'
 import { Task } from '../data/schema'
 import { deleteTask } from '../actions'
 
-interface TasksClientProps {
+interface TasksContentProps {
   initialTasks: Task[]
 }
 
-export function TasksClient({ initialTasks }: TasksClientProps) {
+export function TasksContent({ initialTasks }: TasksContentProps) {
   // Local states
   const [currentRow, setCurrentRow] = useState<Task | null>(null)
   const [open, setOpen] = useDialogState<TasksDialogType>(null)
