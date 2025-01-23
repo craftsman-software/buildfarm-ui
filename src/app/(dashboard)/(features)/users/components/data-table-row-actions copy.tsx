@@ -17,9 +17,9 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useUsersContext } from '../context/users-context'
-import { userTypes } from '../data/data'
-import { userSchema } from '../data/schema'
+import { useTasksContext } from '../context/tasks-context'
+import { labels } from '../data/data'
+import { taskSchema } from '../data/schema'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
@@ -28,9 +28,9 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const user = userSchema.parse(row.original)
+  const task = taskSchema.parse(row.original)
 
-  const { setOpen, setCurrentRow } = useUsersContext()
+  const { setOpen, setCurrentRow } = useTasksContext()
 
   return (
     <DropdownMenu modal={false}>
@@ -46,21 +46,22 @@ export function DataTableRowActions<TData>({
       <DropdownMenuContent align='end' className='w-[160px]'>
         <DropdownMenuItem
           onClick={() => {
-            setCurrentRow(user)
+            setCurrentRow(task)
             setOpen('update')
           }}
         >
           Edit
         </DropdownMenuItem>
         <DropdownMenuItem disabled>Make a copy</DropdownMenuItem>
+        <DropdownMenuItem disabled>Favorite</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Role</DropdownMenuSubTrigger>
+          <DropdownMenuSubTrigger>Labels</DropdownMenuSubTrigger>
           <DropdownMenuSubContent>
-            <DropdownMenuRadioGroup value={user.role}>
-              {userTypes.map((role) => (
-                <DropdownMenuRadioItem key={role.value} value={role.value}>
-                  {role.label}
+            <DropdownMenuRadioGroup value={task.label}>
+              {labels.map((label) => (
+                <DropdownMenuRadioItem key={label.value} value={label.value}>
+                  {label.label}
                 </DropdownMenuRadioItem>
               ))}
             </DropdownMenuRadioGroup>
@@ -69,7 +70,7 @@ export function DataTableRowActions<TData>({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            setCurrentRow(user)
+            setCurrentRow(task)
             setOpen('delete')
           }}
         >
