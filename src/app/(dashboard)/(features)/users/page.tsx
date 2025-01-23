@@ -1,58 +1,74 @@
 'use client'
 
-import { useState } from 'react'
-import { IconMailPlus, IconUserPlus } from '@tabler/icons-react'
-import useDialogState from '@/hooks/use-dialog-state'
-import { Button } from '@/components/ui/button'
-import { UsersActionDialog } from './components/users-action-dialog'
-import { columns } from './components/users-columns'
-import { UsersDeleteDialog } from './components/users-delete-dialog'
-import { UsersInviteDialog } from './components/users-invite-dialog'
-import { UsersTable } from './components/users-table'
-import UsersContextProvider, {
-  type UsersDialogType,
-} from './context/users-context'
+import { deleteUser, getUsers } from './actions'
+import { HeaderContainer } from '@/components/ui/header-container'
+import { UsersHeader } from './components/users-header'
+import { useEffect, useState } from 'react'
 import { User, userListSchema } from './data/schema'
-import { users } from './data/users'
+import useDialogState from '@/hooks/use-dialog-state'
+import UsersContextProvider, { UsersDialogType } from './context/users-context'
+import { toast } from '@/hooks/use-toast'
+import { ConfirmDialog } from '@/components/confirm-dialog'
+import { DataTable } from '@/components/data-table/data-table'
+import { columns } from './components/columns'
+import { UsersInviteDialog } from './components/users-invite-dialog'
+import { UsersMutateDrawer } from './components/users-mutate-drawer'
+import { UsersImportDialog } from './components/users-import-dialog'
 
-export default function Users() {
-  // Dialog states
+export default function Page() {
+  const [users, setUsers] = useState<User[]>([])
+ 
+  useEffect(() => {
+    const updateUsers = async () => {
+      const rawUsers = await getUsers()
+      const users = userListSchema.parse(rawUsers)
+      setUsers(users)
+    }
+
+    updateUsers()
+  }, [])
+
+  // Local states
   const [currentRow, setCurrentRow] = useState<User | null>(null)
   const [open, setOpen] = useDialogState<UsersDialogType>(null)
 
-  // Parse user list
-  const userList = userListSchema.parse(users)
+  const handleDelete = async (user: User) => {
+    try {
+      await deleteUser(user.id)
+      setUsers(users.filter(u => u.id !== user.id))
+      toast({
+        title: 'The following user has been deleted:',
+        description: (
+          <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+            <code className='text-white'>
+              {JSON.stringify(user, null, 2)}
+            </code>
+          </pre>
+        ),
+      })
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to delete user',
+        variant: 'destructive',
+      })
+    }
+  }
 
   return (
     <UsersContextProvider value={{ open, setOpen, currentRow, setCurrentRow }}>
-      <div className='mb-2 flex items-center justify-between space-y-2 flex-wrap'>
-        <div>
-          <h2 className='text-2xl font-bold tracking-tight'>User List</h2>
-          <p className='text-muted-foreground'>
-            Manage your users and their roles here.
-          </p>
-        </div>
-        <div className='flex gap-2'>
-          <Button
-            variant='outline'
-            className='space-x-1'
-            onClick={() => setOpen('invite')}
-          >
-            <span>Invite User</span> <IconMailPlus size={18} />
-          </Button>
-          <Button className='space-x-1' onClick={() => setOpen('add')}>
-            <span>Add User</span> <IconUserPlus size={18} />
-          </Button>
-        </div>
-      </div>
+      <HeaderContainer>
+        <UsersHeader />
+      </HeaderContainer>
+
       <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0'>
-        <UsersTable data={userList} columns={columns} />
+        <DataTable data={users} columns={columns} />
       </div>
 
-      <UsersActionDialog
-        key='user-add'
-        open={open === 'add'}
-        onOpenChange={() => setOpen('add')}
+      <UsersMutateDrawer
+        key='user-create'
+        open={open === 'create'}
+        onOpenChange={() => setOpen('create')}
       />
 
       <UsersInviteDialog
@@ -61,13 +77,19 @@ export default function Users() {
         onOpenChange={() => setOpen('invite')}
       />
 
+      <UsersImportDialog
+        key='users-import'
+        open={open === 'import'}
+        onOpenChange={() => setOpen('import')}
+      />
+
       {currentRow && (
         <>
-          <UsersActionDialog
-            key={`user-edit-${currentRow.id}`}
-            open={open === 'edit'}
+          <UsersMutateDrawer
+            key={`user-update-${currentRow.id}`}
+            open={open === 'update'}
             onOpenChange={() => {
-              setOpen('edit')
+              setOpen('update')
               setTimeout(() => {
                 setCurrentRow(null)
               }, 500)
@@ -75,8 +97,9 @@ export default function Users() {
             currentRow={currentRow}
           />
 
-          <UsersDeleteDialog
-            key={`user-delete-${currentRow.id}`}
+          <ConfirmDialog
+            key='user-delete'
+            destructive
             open={open === 'delete'}
             onOpenChange={() => {
               setOpen('delete')
@@ -84,7 +107,17 @@ export default function Users() {
                 setCurrentRow(null)
               }, 500)
             }}
-            currentRow={currentRow}
+            handleConfirm={() => handleDelete(currentRow)}
+            className='max-w-md'
+            title={`Delete this user: ${currentRow.id} ?`}
+            desc={
+              <>
+                You are about to delete a user with the ID{' '}
+                <strong>{currentRow.id}</strong>. <br />
+                This action cannot be undone.
+              </>
+            }
+            confirmText='Delete'
           />
         </>
       )}

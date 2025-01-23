@@ -3,7 +3,7 @@
 import React from 'react'
 import { User } from '../data/schema'
 
-export type UsersDialogType = 'invite' | 'add' | 'edit' | 'delete'
+export type UsersDialogType = 'invite' | 'create' | 'edit' | 'delete' | 'import' | 'update'
 
 interface UsersContextType {
   open: UsersDialogType | null
