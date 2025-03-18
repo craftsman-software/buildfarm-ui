@@ -12,6 +12,7 @@ import { Search } from "@/components/search"
 import { ThemeSwitch } from "@/components/theme-switch"
 import { Main } from '@/components/ui/main'
 import { HeaderContainer } from "@/components/ui/header-container"
+import { example } from "@/proto/client-example"
 
 const topNav = [
   {
@@ -41,6 +42,7 @@ const topNav = [
 ]
 
 export default function DashboardPage() {
+  example().catch(console.error);
   return (
     <>
       <Header fixed>

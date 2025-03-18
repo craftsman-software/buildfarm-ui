@@ -52,7 +52,7 @@ export class RemoteExecutionClient {
 /**
  * 使用例
  */
-async function example(): Promise<void> {
+export async function example(): Promise<void> {
   // Remote Execution クライアントの作成
   const client = new RemoteExecutionClient("localhost:8080");
   
@@ -75,6 +75,3 @@ async function example(): Promise<void> {
     console.error("Failed to get capabilities:", error);
   }
 }
-
-// 実行例
-example().catch(console.error);
